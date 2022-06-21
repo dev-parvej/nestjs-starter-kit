@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  exam-app:
+    image: exam-app
+    container_name: exam-app
+    env_file: .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: npm run start:debug
+    ports: 
+      - 3000:3000
+      - 9229:9229
+    networks:
+      - exam-app-networks
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: always
+    depends_on:
+      - exam-db
+  exam-db:
+    image: postgres
+    container_name: exam-db
+    restart: unless-stopped
+    networks:
+      - exam-app-networks
+    environment:
+      - POSTGRES_USER=exam
+      - POSTGRES_PASSWORD=exam
+      - POSTGRES_DB=exam
+    ports:
+      - 5432:5432
+    volumes:
+      - ../data:/var/lib/postgresql/data
+
+networks:
+  exam-app-networks:
